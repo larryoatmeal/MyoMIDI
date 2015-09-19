@@ -25,8 +25,25 @@ class MidiConverter:
 #     midiout.open_port(0)
 # else:
 
-	def sendNote(self):
+	#Value should be int 0-127
+	def sendCCMessage(self, cc, value):
+		message = [0xB0, cc, value]
+		self.midiout.send_message(message)
 
+	#Value should be float 0-1
+	def sendPitchBendMessage(self, value):
+		#-1 becomes 0
+		#1 becomes 1
+		#0 becomes 0.5
+		adjustedValue = 0.5* (1 + value)
+		integerRepresentation = min(16384-1, int(adjustedValue * 16384))
+		msb = integerRepresentation >> 7 
+		lsb = integerRepresentation & (2^7 - 1) 
+		message = [0xE0, lsb, msb]
+		self.midiout.send_message(message)
+
+
+	def sendNote(self):
 		randomNote = randint(65,90)
 
 		note_on = [0x90, randomNote, 112] # channel 1, random note, velocity 112
@@ -43,8 +60,10 @@ class MidiConverter:
 midiConverter = MidiConverter()
 
 while(True):
-	midiConverter.sendNote()
-
+	randomValue = randint(0,127)
+	midiConverter.sendCCMessage(11, randomValue)
+	midiConverter.sendPitchBendMessage(randomValue/127.0)
+	time.sleep(0.1)
 
 
 
