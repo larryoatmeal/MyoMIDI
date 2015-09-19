@@ -42,17 +42,13 @@ class MidiConverter:
 		message = [0xE0, lsb, msb]
 		self.midiout.send_message(message)
 
-
-	def sendNote(self):
-		randomNote = randint(65,90)
-
-		note_on = [0x90, randomNote, 112] # channel 1, random note, velocity 112
-		note_off = [0x80, randomNote, 0]
+	def sendNoteOn(self, pitch, velocity = 112):
+		note_on = [0x90, pitch, velocity]
 		self.midiout.send_message(note_on)
-		time.sleep(0.1)
-		self.midiout.send_message(note_off)
-		time.sleep(0.1)
 
+	def sendNoteOff(self, pitch, velocity = 112):
+		note_off = [0x80, pitch, velocity]
+		self.midiout.send_message(note_off)
 
 	def close(self):
 		del midiout
