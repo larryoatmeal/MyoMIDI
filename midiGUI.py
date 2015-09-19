@@ -40,20 +40,16 @@ display.insert(tk.END, "No Patch Selected Yet")
 allDropDowns = [[None for j in range(len(MYO_PARAMETERS))] for i in range(NUMBER_OF_PATCHES)]
 
 options = ["Pitch"] + map(str, range(1,128))
+Vars = [[tk.StringVar() for j in range(len(MYO_PARAMETERS))] for i in range(NUMBER_OF_PATCHES)]
+
 for patchNumber in range(NUMBER_OF_PATCHES):
     for myoParameterIndex in range(len(MYO_PARAMETERS)):
 
-        var = tk.StringVar()
+        var = Vars[patchNumber][myoParameterIndex]
         dropDownMenu = apply(tk.OptionMenu, (root, var) + tuple(options))
         dropDownMenu.grid(row = 2 + myoParameterIndex, column = 1 + patchNumber)
 
         allDropDowns[patchNumber][myoParameterIndex] = dropDownMenu
-
-        def onSelect(event):
-            print("binding activated with value = " + var.get())
-            patches[MYO_PARAMETERS[i]] = var.get()
-
-        dropDownMenu.bind('<Key>', onSelect);
 
 
 def clickPatch_event(key):
@@ -68,10 +64,11 @@ def clickPatch_event(key):
 For use by Midi Converter
 '''
 def getValue(patchNumber, myoParam):
-    if patches[myoParam] == None:
-        raise Exception("failed to set the patch + param value for Patch: %s, Myo Parameter: %s" \
+    index = MYO_PARAMETERS.index(myoParam)
+    if index == -1 or patches[index].get() == '':
+        raise Exception("failed to find the patch + param value for Patch: %s, Myo Parameter: %s" \
             %(pathNumber, myoParam))
-    return patches[myoParam]
+    return patches[index].get()
 
 
 
