@@ -15,7 +15,6 @@ DOUBLE_TAP = 2
 WAVE_OUT = 3
 WAVE_IN = 4
 FINGERS_SPREAD = 5
-UNKNOWN = 6
 
 '''
  Get-able Values:
@@ -103,8 +102,6 @@ class _Listener(libmyo.DeviceListener):
             self.values['pose'] = FINGERS_SPREAD
         elif pose == libmyo.pose.double_tap:
             self.values['pose'] = DOUBLE_TAP
-        elif pose == libmyo.pose.unknown:
-            self.values['pose'] = UNKNOWN
 
     def on_orientation_data(self, myo, timestamp, orientation):
         x = orientation.x
@@ -114,9 +111,10 @@ class _Listener(libmyo.DeviceListener):
 
         #print orientation
 
-        roll =  math.atan2(2*y*w - 2*x*z, 1 - 2*y*y - 2*z*z)
-        pitch = math.atan2(2*x*w - 2*y*z, 1 - 2*x*x - 2*z*z)
-        yaw =   math.asin(2*x*y + 2*z*w)
+        # Calculate and set values to be in range [0, 1]
+        roll =  (math.atan2(2*y*w - 2*x*z, 1 - 2*y*y - 2*z*z)/math.pi+1)/2
+        pitch = (math.atan2(2*x*w - 2*y*z, 1 - 2*x*x - 2*z*z)/math.pi+1)/2
+        yaw =   (math.asin(2*x*y + 2*z*w)/(math.pi/2)+1)/2
 
         self.values['roll'] =  roll
         self.values['pitch'] = pitch
