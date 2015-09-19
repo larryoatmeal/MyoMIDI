@@ -37,17 +37,23 @@ display = tk.Entry(root, width = 40, bg = "white")
 display.grid(row = 0, column = 0, columnspan = 5)
 display.insert(tk.END, "No Patch Selected Yet")
 
-def displayParameters():
-    options = ["Pitch"] + map(str, range(1,128))
-    for patchNumber in range(NUMBER_OF_PATCHES):
-        for myoParameterIndex in range(len(MYO_PARAMETERS)):
+allDropDowns = [[None for j in range(len(MYO_PARAMETERS))] for i in range(NUMBER_OF_PATCHES)]
 
-            var = tk.StringVar()
-            dropDownMenu = apply(tk.OptionMenu, (root, var) + tuple(options))
-            dropDownMenu.grid(row = 2 + myoParameterIndex, column = 1 + patchNumber)
+options = ["Pitch"] + map(str, range(1,128))
+for patchNumber in range(NUMBER_OF_PATCHES):
+    for myoParameterIndex in range(len(MYO_PARAMETERS)):
 
+        var = tk.StringVar()
+        dropDownMenu = apply(tk.OptionMenu, (root, var) + tuple(options))
+        dropDownMenu.grid(row = 2 + myoParameterIndex, column = 1 + patchNumber)
 
-displayParameters()
+        allDropDowns[patchNumber][myoParameterIndex] = dropDownMenu
+
+        def onSelect(event):
+            print("binding activated with value = " + var.get())
+            patches[MYO_PARAMETERS[i]] = var.get()
+
+        dropDownMenu.bind('<Key>', onSelect);
 
 
 def clickPatch_event(key):
@@ -73,57 +79,3 @@ def getValue(patchNumber, myoParam):
 root.mainloop()
 
 
-
-
-
-
-
-'''
-    # = -> rootulate results
-    if key == '=':
-        # safeguard against integer division
-        if '/' in display.get() and '.' not in display.get():
-            display.insert(tk.END, ".0")
-            
-        # attempt to evaluate results
-        try:
-            result = eval(display.get())
-            display.insert(tk.END, " = " + str(result))
-        except:
-            display.insert(tk.END, "   Error, use only valid chars")
-            
-    # C -> clear display        
-    elif key == 'C':
-        display.delete(0, tk.END)
-        
-        
-    # $ -> clear display        
-    elif key == '$':
-        display.delete(0, tk.END)
-        display.insert(tk.END, "$$$$C.$R.$E.$A.$M.$$$$")
-        
-
-    # @ -> clear display        
-    elif key == '@':
-        display.delete(0, tk.END)
-        display.insert(tk.END, "wwwwwwwwwwwwwwwwebsite")        
-
-        
-    # neg -> negate term
-    elif key == 'neg':
-        if '=' in display.get():
-            display.delete(0, tk.END)
-        try:
-            if display.get()[0] == '-':
-                display.delete(0)
-            else:
-                display.insert(0, '-')
-        except IndexError:
-            pass
-
-    # clear display and start new input     
-    else:
-        if '=' in display.get():
-            display.delete(0, tk.END)
-        display.insert(tk.END, key)
-'''
