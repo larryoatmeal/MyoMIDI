@@ -112,6 +112,8 @@ class _Listener(libmyo.DeviceListener):
         z = orientation.z
         w = orientation.w
 
+        #print orientation
+
         roll =  math.atan2(2*y*w - 2*x*z, 1 - 2*y*y - 2*z*z)
         pitch = math.atan2(2*x*w - 2*y*z, 1 - 2*x*x - 2*z*z)
         yaw =   math.asin(2*x*y + 2*z*w)
