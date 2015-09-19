@@ -1,0 +1,5 @@
+
+
+[osc2midi]
+pyliblo
+PyYAML
