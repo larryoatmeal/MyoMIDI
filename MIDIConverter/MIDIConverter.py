@@ -1,6 +1,5 @@
 import time
 import rtmidi
-from random import randint
 
 #Settings
 portName = "MyoMIDI"
@@ -8,7 +7,6 @@ currentTime = lambda: int(round(time.time() * 1000))
 
 
 class MidiConverter:
-
 	def __init__(self):
 		print "MidiConverter setting up"
 		startTime = currentTime()
@@ -16,7 +14,6 @@ class MidiConverter:
 		self.midiout.open_virtual_port(portName)
 		elapsedTime = currentTime() - startTime
 		print "MidiConverter finished setting up:", elapsedTime, "ms"
-
 # available_ports = midiout.get_ports()
 
 # print available_ports
@@ -53,13 +50,7 @@ class MidiConverter:
 	def close(self):
 		del midiout
 
-midiConverter = MidiConverter()
 
-while(True):
-	randomValue = randint(0,127)
-	midiConverter.sendCCMessage(11, randomValue)
-	midiConverter.sendPitchBendMessage(randomValue/127.0)
-	time.sleep(0.1)
 
 
 
