@@ -1,0 +1,3 @@
+[console_scripts]
+osc2midi = osc2midi.main:main [osc2midi]
+
