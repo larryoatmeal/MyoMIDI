@@ -11,3 +11,6 @@ If you get an "ImportError “No Module named Setuptools"", run
 curl https://bootstrap.pypa.io/ez_setup.py -o - | python
 
 and try again
+
+
+export DYLD_LIBRARY_PATH=[path to myo.framework]
