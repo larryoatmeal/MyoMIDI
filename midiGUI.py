@@ -11,7 +11,13 @@ root.title("MIDI GUI")
 CC# + Pitch Bend
 '''
 NUMBER_OF_PATCHES = 4
-MYO_PARAMETERS = ['X', 'Y', 'Z', 'ANGLE']
+
+X = 'X'
+Y = 'Y'
+Z = 'Z'
+ANGLE = 'ANGLE'
+
+MYO_PARAMETERS = [X, Y, Z, ANGLE]
 patchButtons = [None] * NUMBER_OF_PATCHES
 patches = [None] * NUMBER_OF_PATCHES
 
@@ -68,14 +74,36 @@ For use by Midi Converter
 '''
 def getValue(patchNumber, myoParam):
     index = MYO_PARAMETERS.index(myoParam)
-    if index == -1 or Vars[patchNumber][index].get() == '':
-        raise Exception("failed to find the patch + param value for Patch: %s, Myo Parameter: %s" \
-            %(pathNumber, myoParam))
-    return Vars[patchNumber][index].get()
+    if index == -1:
+        raise Exception("Myo Parameter: %s not valid" \
+            %(myoParam))
+
+    value = Vars[patchNumber][index].get()
+    if value == '':
+        return None
+    else:
+        return value
 
 def mainLoop():
     myoInfo = myo_api.get_myo_info_object()
     while True:
+        x = myoInfo.get("yaw")
+        y = myoInfo.get("pitch")
+        z = myoInfo.get("roll")
+
+        ccForX = getValue(1, X)
+        ccForY = getValue(1, Y)
+        ccForZ = getValue(1, Z)
+
+        print "x", x
+        print "y", y
+        print "z", z
+
+        print "ccForX", ccForX
+        print "ccForY", ccForY
+        print "ccForZ", ccForZ
+
+        #print "Pitch",myoInfo.get("pitch")
         time.sleep(0.1)
 
 thread = Thread(target=mainLoop)
