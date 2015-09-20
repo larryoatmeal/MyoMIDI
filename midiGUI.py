@@ -137,7 +137,7 @@ def mainLoop():
         x = scaleValue(myoInfo.get("yaw")) * 127
         y = scaleValue(myoInfo.get("pitch")) * 127
         z = scaleValue(myoInfo.get("roll")) * 127
-
+        
         # x = myoInfo.get("yaw") * 127
         # y = myoInfo.get("pitch") * 127
         # z = myoInfo.get("roll") * 127
