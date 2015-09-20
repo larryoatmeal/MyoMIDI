@@ -74,5 +74,3 @@ def getValue(patchNumber, myoParam):
 
 # RUNTIME
 root.mainloop()
-
-
