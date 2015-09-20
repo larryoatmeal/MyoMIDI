@@ -1,5 +1,9 @@
 import Tkinter as tk
- 
+from threading import Thread
+import time
+import myo_api.myo_api as myo_api
+
+
 root = tk.Tk()
 root.title("MIDI GUI")
 
@@ -57,9 +61,6 @@ def clickPatch_event(key):
     display.delete(0, tk.END)
     display.insert(tk.END, key)
 
-
-
-
 '''
 For use by Midi Converter
 '''
@@ -70,7 +71,14 @@ def getValue(patchNumber, myoParam):
             %(pathNumber, myoParam))
     return patches[index].get()
 
+def mainLoop():
+    while True:
+        myoInfo = myo_api.get_myo_info_object()
+        time.sleep(0.1)
 
+thread = Thread(target=mainLoop)
+thread.daemon = True
+thread.start()
 
 # RUNTIME
 root.mainloop()
