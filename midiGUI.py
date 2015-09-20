@@ -1,7 +1,7 @@
 import Tkinter as tk
 from threading import Thread
 import time
-import myo_api.myo_api as myo_api
+# import myo_api.myo_api as myo_api
 
 
 root = tk.Tk()
@@ -61,15 +61,17 @@ def clickPatch_event(key):
     display.delete(0, tk.END)
     display.insert(tk.END, key)
 
+print patches
+print Vars
 '''
 For use by Midi Converter
 '''
 def getValue(patchNumber, myoParam):
     index = MYO_PARAMETERS.index(myoParam)
-    if index == -1 or patches[index].get() == '':
+    if index == -1 or Vars[patchNumber][index].get() == '':
         raise Exception("failed to find the patch + param value for Patch: %s, Myo Parameter: %s" \
             %(pathNumber, myoParam))
-    return patches[index].get()
+    return Vars[patchNumber][index].get()
 
 def mainLoop():
     myoInfo = myo_api.get_myo_info_object()
