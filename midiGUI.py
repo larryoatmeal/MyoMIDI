@@ -54,7 +54,7 @@ display.insert(tk.END, "No Patch Selected Yet")
 
 allDropDowns = [[None for j in range(len(MYO_PARAMETERS))] for i in range(NUMBER_OF_PATCHES)]
 
-options = ["Pitch"] + map(str, range(1,128))
+options = ["", "Pitch"] + map(str, range(1,128))
 Vars = [[tk.StringVar() for j in range(len(MYO_PARAMETERS))] for i in range(NUMBER_OF_PATCHES)]
 
 for patchNumber in range(NUMBER_OF_PATCHES):
@@ -80,6 +80,7 @@ movementRadiusSlider = tk.Scale(root, from_=0, to=1,
                                       sliderlength=30)
 movementRadiusSlider.grid(row = 1 + 1 + len(MYO_PARAMETERS), column=2, 
                           columnspan=2)
+movementRadiusSlider.set(1)
 
 print type(movementRadiusSlider.get()) is float
 print type(movementRadiusSlider.get()) is str
@@ -100,35 +101,52 @@ def getValue(patchNumber, myoParam):
     else:
         return value
 
-def scaleValue(x):
-    deviation = x - 0.5
-    return 0.5 + deviation * movementRadiusSlider.get() 
 
-cache = {(1,X):0,(1,Y):0,(1,Z):0}
+cache = {}
+
+for i in range(0, NUMBER_OF_PATCHES):
+    cache[(i, X)] = 0
+    cache[(i, Y)] = 0
+    cache[(i, Z)] = 0
+cachedScaleValue = 1
 
 def refreshValues():
     while True:
-        cache[(1,X)] = getValue(1, X)
-        cache[(1,Y)] = getValue(1, Y)
-        cache[(1,Z)] = getValue(1, Z)
+        for i in range(0, NUMBER_OF_PATCHES):
+            cache[(i, X)] = getValue(i, X)
+            cache[(i, Y)] = getValue(i, Y)
+            cache[(i, Z)] = getValue(i, Z)
+        cachedScaleValue = movementRadiusSlider.get()
         time.sleep(0.1)
+
+def scaleValue(x):
+    deviation = x - 0.5
+    return 0.5 + deviation * cachedScaleValue
 
 def mainLoop():
     myoInfo = myo_api.get_myo_info_object()
     midi = MIDIConverter.MidiConverter()
-    while True:
-        #x = scaleValue(myoInfo.get("yaw")) * 127
-        #y = scaleValue(myoInfo.get("pitch")) * 127
-        #z = scaleValue(myoInfo.get("roll")) * 127
+    patchNumber = 0
 
-        x = myoInfo.get("yaw") * 127
-        y = myoInfo.get("pitch") * 127
-        z = myoInfo.get("roll") * 127
+    while True:
+
+        if(myoInfo.getLastGesture() == myo_api.DOUBLE_TAP):
+            print "DOUBLE TAP"
+            patchNumber = (patchNumber + 1) % NUMBER_OF_PATCHES
+
+        x = scaleValue(myoInfo.get("yaw")) * 127
+        y = scaleValue(myoInfo.get("pitch")) * 127
+        z = scaleValue(myoInfo.get("roll")) * 127
+
+        # x = myoInfo.get("yaw") * 127
+        # y = myoInfo.get("pitch") * 127
+        # z = myoInfo.get("roll") * 127
+        ccForX = cache[(patchNumber,X)]
+        ccForY = cache[(patchNumber,Y)]
+        ccForZ = cache[(patchNumber,Z)]
         
-        ccForX = cache[(1,X)]
-        ccForY = cache[(1,Y)]
-        ccForZ = cache[(1,Z)]
-        
+        print "patchNumber", patchNumber
+
         print "x", x
         print "y", y
         print "z", z
@@ -137,12 +155,23 @@ def mainLoop():
         print "ccForY", ccForY
         print "ccForZ", ccForZ
 
-        if ccForX != None:
-            midi.sendCCMessage(int(ccForX), x)
-        if ccForY != None:
-            midi.sendCCMessage(int(ccForY), y)
-        if ccForZ != None:
-            midi.sendCCMessage(int(ccForZ), z)
+        controls = [
+            (ccForX, x),
+            (ccForY, y),
+            (ccForZ, z)
+        ]
+
+        for (controlType, controlValue) in controls:
+            if controlType != None:
+                if controlType == "Pitch":
+                    midi.sendPitchBendMessage(controlValue)
+                else:
+                    midi.sendCCMessage(int(controlType), controlValue)
+        # if ccForX != None:
+        # if ccForY != None:
+        #     midi.sendCCMessage(int(ccForY), y)
+        # if ccForZ != None:
+        #     midi.sendCCMessage(int(ccForZ), z)
             
         #print "Pitch",myoInfo.get("pitch")
         time.sleep(0.1)

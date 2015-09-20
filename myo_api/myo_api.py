@@ -78,7 +78,11 @@ class _Listener(libmyo.DeviceListener):
         self._reset_values()
         self.done = False
         self.locks = {k: threading.Lock() for k in self.values}
-
+        self.lastGesture = None
+    def getLastGesture(self):
+        gesture = self.lastGesture
+        self.lastGesture = None
+        return gesture
     def get(self, key):
         if key not in self.values.keys():
             raise InputError('Key does not exist')
@@ -97,14 +101,19 @@ class _Listener(libmyo.DeviceListener):
             self.values['pose'] = REST
         elif pose == libmyo.pose.fist:
             self.values['pose'] = FIST
+            self.lastGesture = FIST
         elif pose == libmyo.pose.wave_in:
             self.values['pose'] = WAVE_IN
+            self.lastGesture = WAVE_IN
         elif pose == libmyo.pose.wave_out:
             self.values['pose'] = WAVE_OUT
+            self.lastGesture = WAVE_OUT
         elif pose == libmyo.pose.fingers_spread:
             self.values['pose'] = FINGERS_SPREAD
+            self.lastGesture = FINGERS_SPREAD
         elif pose == libmyo.pose.double_tap:
             self.values['pose'] = DOUBLE_TAP
+            self.lastGesture = DOUBLE_TAP
 
     def on_orientation_data(self, myo, timestamp, orientation):
         x = orientation.x
@@ -127,17 +136,18 @@ class _Listener(libmyo.DeviceListener):
         self.values['acceleration_z'] = acceleration.z
 
     def on_gyroscope_data(self, myo, timestamp, gyroscope):
-        def fit_from_0_to_1(x):
-            hopefully_good_val = math.log(abs(x))/7.0*math.copysign(1.0, x)+7.0
-            if hopefully_good_val > 1:
-                print "shit"
-                return 1
-            if hopefully_good_val < 0:
-                return 0
-            return hopefully_good_val
-        self.values['angular_velocity_x'] = fit_from_0_to_1(gyroscope.x)
-        self.values['angular_velocity_y'] = fit_from_0_to_1(gyroscope.y)
-        self.values['angular_velocity_z'] = fit_from_0_to_1(gyroscope.z)
+        pass
+        # def fit_from_0_to_1(x):
+        #     hopefully_good_val = math.log(abs(x))/7.0*math.copysign(1.0, x)+7.0
+        #     if hopefully_good_val > 1:
+        #         print "shit"
+        #         return 1
+        #     if hopefully_good_val < 0:
+        #         return 0
+        #     return hopefully_good_val
+        # self.values['angular_velocity_x'] = fit_from_0_to_1(gyroscope.x)
+        # self.values['angular_velocity_y'] = fit_from_0_to_1(gyroscope.y)
+        # self.values['angular_velocity_z'] = fit_from_0_to_1(gyroscope.z)
 
     def _reset_values(self):
         self.values = {
