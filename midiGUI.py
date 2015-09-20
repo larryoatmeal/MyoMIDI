@@ -1,8 +1,8 @@
 import Tkinter as tk
 from threading import Thread
 import time
-# import myo_api.myo_api as myo_api
-
+import myo_api.myo_api as myo_api
+import MIDIConverter.MIDIConverter as MIDIConverter
 
 root = tk.Tk()
 root.title("MIDI GUI")
@@ -86,10 +86,11 @@ def getValue(patchNumber, myoParam):
 
 def mainLoop():
     myoInfo = myo_api.get_myo_info_object()
+    midi = MIDIConverter.MidiConverter()
     while True:
-        x = myoInfo.get("yaw")
-        y = myoInfo.get("pitch")
-        z = myoInfo.get("roll")
+        x = myoInfo.get("yaw") * 127
+        y = myoInfo.get("pitch") * 127
+        z = myoInfo.get("roll") * 127
 
         ccForX = getValue(1, X)
         ccForY = getValue(1, Y)
@@ -102,6 +103,13 @@ def mainLoop():
         print "ccForX", ccForX
         print "ccForY", ccForY
         print "ccForZ", ccForZ
+
+        if ccForX != None:
+            midi.sendCCMessage(int(ccForX), x)
+        if ccForY != None:
+            midi.sendCCMessage(int(ccForY), y)
+        if ccForZ != None:
+            midi.sendCCMessage(int(ccForZ), z)
 
         #print "Pitch",myoInfo.get("pitch")
         time.sleep(0.1)
