@@ -1,8 +1,8 @@
 import Tkinter as tk
 from threading import Thread
 import time
-import myo_api.myo_api as myo_api
-import MIDIConverter.MIDIConverter as MIDIConverter
+# import myo_api.myo_api as myo_api
+# import MIDIConverter.MIDIConverter as MIDIConverter
 
 root = tk.Tk()
 root.title("MIDI GUI")
@@ -39,6 +39,11 @@ for i in range(len(patchButtons)):
     button = tk.Button(root, text=buttonName, width=20, height=15, relief=button_style, command=action)
     button.grid(row=1, column = 1 + i, sticky='nesw', )
 
+def clickPatch_event(key):
+
+    display.delete(0, tk.END)
+    display.insert(tk.END, key)
+
 for i in range(len(MYO_PARAMETERS)):
     e = tk.Label(root, text=MYO_PARAMETERS[i])
     e.grid(row=2+i, column=0)
@@ -62,13 +67,24 @@ for patchNumber in range(NUMBER_OF_PATCHES):
         allDropDowns[patchNumber][myoParameterIndex] = dropDownMenu
 
 
-def clickPatch_event(key):
+'''
+Create slider that defines movement radius.
 
-    display.delete(0, tk.END)
-    display.insert(tk.END, key)
+Type movementRadius.get() to obtain value as float
+'''
+movementRadiusSlider = tk.Scale(root, from_=0, to=1, 
+                                      orient=tk.HORIZONTAL, 
+                                      resolution=0.01,
+                                      label="Movement Radius",
+                                      length=200,
+                                      sliderlength=30)
+movementRadiusSlider.grid(row = 1 + 1 + len(MYO_PARAMETERS), column=2, 
+                          columnspan=2)
 
-print patches
-print Vars
+print type(movementRadiusSlider.get()) is float
+print type(movementRadiusSlider.get()) is str
+print movementRadiusSlider.get()
+
 '''
 For use by Midi Converter
 '''
