@@ -49,6 +49,8 @@ def _start_data_gathering_thread(info_object):
         try:
             while hub.running:
                 time.sleep(TIME_PER_UPDATE)
+                if info_object.done:
+                    break
 
         except KeyboardInterrupt:
             info_object.shutdown()
@@ -74,6 +76,7 @@ class _Listener(libmyo.DeviceListener):
 
     def __init__(self):
         self._reset_values()
+        self.done = False
         self.locks = {k: threading.Lock() for k in self.values}
 
     def get(self, key):
@@ -87,7 +90,7 @@ class _Listener(libmyo.DeviceListener):
         return value
 
     def shutdown(self):
-        pass
+        self.done = True
 
     def on_pose(self, myo, timestamp, pose):
         if pose == libmyo.pose.rest:
@@ -109,8 +112,6 @@ class _Listener(libmyo.DeviceListener):
         z = orientation.z
         w = orientation.w
 
-        #print orientation
-
         # Calculate and set values to be in range [0, 1]
         roll =  (math.atan2(2*y*w - 2*x*z, 1 - 2*y*y - 2*z*z)/math.pi+1)/2
         pitch = (math.atan2(2*x*w - 2*y*z, 1 - 2*x*x - 2*z*z)/math.pi+1)/2
@@ -126,9 +127,17 @@ class _Listener(libmyo.DeviceListener):
         self.values['acceleration_z'] = acceleration.z
 
     def on_gyroscope_data(self, myo, timestamp, gyroscope):
-        self.values['angular_velocity_x'] = gyroscope.x
-        self.values['angular_velocity_y'] = gyroscope.y
-        self.values['angular_velocity_z'] = gyroscope.z
+        def fit_from_0_to_1(x):
+            hopefully_good_val = math.log(abs(x))/7.0*math.copysign(1.0, x)+7.0
+            if hopefully_good_val > 1:
+                print "shit"
+                return 1
+            if hopefully_good_val < 0:
+                return 0
+            return hopefully_good_val
+        self.values['angular_velocity_x'] = fit_from_0_to_1(gyroscope.x)
+        self.values['angular_velocity_y'] = fit_from_0_to_1(gyroscope.y)
+        self.values['angular_velocity_z'] = fit_from_0_to_1(gyroscope.z)
 
     def _reset_values(self):
         self.values = {
