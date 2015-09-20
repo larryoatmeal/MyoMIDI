@@ -72,8 +72,8 @@ def getValue(patchNumber, myoParam):
     return patches[index].get()
 
 def mainLoop():
+    myoInfo = myo_api.get_myo_info_object()
     while True:
-        myoInfo = myo_api.get_myo_info_object()
         time.sleep(0.1)
 
 thread = Thread(target=mainLoop)
